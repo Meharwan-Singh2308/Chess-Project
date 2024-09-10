@@ -6,6 +6,29 @@ let draggedPiece = null;
 let sourceSquare = null;
 let playerRole = null;
 
+
+const pieceImages = {
+    black:{
+        p: "images/ChessIcons/black/pawn.png",
+        n: "images/ChessIcons/black/knight.png",
+        b: "images/ChessIcons/black/bishop.png",
+        r: "images/ChessIcons/black/rook.png",
+        q: "images/ChessIcons/black/queen.png",
+        k: "images/ChessIcons/black/king.png"
+    },
+    white:{
+        p: "images/ChessIcons/white/pawn.png",
+        n: "images/ChessIcons/white/knight.png",
+        b: "images/ChessIcons/white/bishop.png",
+        r: "images/ChessIcons/white/rook.png",
+        q: "images/ChessIcons/white/queen.png",
+        k: "images/ChessIcons/white/king.png",
+    },
+
+   
+  
+};
+
 const renderBoard = () => {
   const board = chess.board();
   boardElement.innerHTML = "";
@@ -20,14 +43,22 @@ const renderBoard = () => {
         squareElement.dataset.col = squareIndex
     
         if(square){
+            console.log(square.type);
             const pieceElement = document.createElement("div")
     
-            pieceElement.classList.add("piece", square.color == "w" ? "white" : "black")
+            pieceElement.classList.add("piece","relative", square.color == "w" ? "white" : "black")
     
-            pieceElement.innerText = getPieceUnicode(square);
-    
+            const pieceImg = document.createElement("img"); 
+
+            pieceImg.setAttribute("src", square.color === "w" ? pieceImages.white[square.type] : pieceImages.black[square.type])
+
+            pieceImg.alt = `${square.color} ${square.type}`;
+
+            pieceImg.draggable = playerRole === square.color;
             pieceElement.draggable = playerRole === square.color;
-    
+
+            pieceElement.appendChild(pieceImg);
+
             pieceElement.addEventListener("dragstart",(e) => {
                 if(pieceElement.draggable){
                     draggedPiece = pieceElement;
@@ -88,29 +119,7 @@ const handleMove = (source , target) => {
 
     socket.emit("move",move)
 };
-
-const getPieceUnicode = (piece) => {
-    const unicodePieces = {
-        P: "\u2659", // White Pawn
-        N: "\u2658", // White Knight
-        B: "\u2657", // White Bishop
-        R: "\u2656", // White Rook
-        Q: "\u2655", // White Queen
-        K: "\u2654", // White King
-        p: "\u265F", // Black Pawn
-        n: "\u265E", // Black Knight
-        b: "\u265D", // Black Bishop
-        r: "\u265C", // Black Rook
-        q: "\u265B", // Black Queen
-        k: "\u265A"  // Black King
-    };
     
-
-    
-    
-    return unicodePieces[piece.type] || "";
-    
-};
 
 socket.on("playerRole", function(role){
     playerRole = role;
